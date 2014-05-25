@@ -5,6 +5,9 @@ from email.mime.text import MIMEText
 
 # This will hold our cookie gloablly
 sig_cookies = None
+wanted_file_loc = 'wanted.txt'
+lastread_file_loc = 'lastread.txt'
+search_results_file_loc = 'results.txt'
 
 def login_to_sig(sig_un, sig_pass):
     global sig_cookies
@@ -33,7 +36,7 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
     body_text = ""
     
     # This is the title of the first item read during the last run
-    last_read = [item for item in open('lastread.txt', 'r')]
+    last_read = [item for item in open(lastread_file_loc, 'r')]
     last_read_found = False
     
     home_page = login_to_sig(sig_un, sig_pass)
@@ -42,7 +45,7 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
     page = bs4.BeautifulSoup(home_page.content)
     
     # Create a list of wanted items from wanted.txt
-    wanted = [item for item in open('wanted.txt', 'r')]
+    wanted = [item for item in open(wanted_file_loc, 'r')]
     
     # Loop through all the rows on the home page
     for row in page.find_all('div', class_='row'):
@@ -56,7 +59,7 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
             # Save the first non-Featured link we find
             if first_title_saved == False and category != 'Featured':
                 # Open the file, write the title, the close
-                lastread_file = open('lastread.txt', 'w')
+                lastread_file = open(lastread_file_loc, 'w')
                 lastread_file.write(title)
                 lastread_file.close()
                 first_title_saved = True
@@ -126,7 +129,7 @@ def search(sig_un, sig_pass, search_term):
     blank_row = page.find_all('div', class_='row header')
     
     # Open searchresults.txt in write mode. This overwrites previous search results.
-    results_file = open('results.txt', 'w')
+    results_file = open(search_results_file_loc, 'w')
     results_file.write('Category\tTitle\t\t\t\t\t\t\t\tLink\n')
     
     # Loop through all the rows
@@ -141,15 +144,37 @@ def search(sig_un, sig_pass, search_term):
             category = row.find(class_='category').text
             title = row.find(class_='title').text
             link_param = row.find_all('a')[1].get('href')
+            # If the title is less than 60 chars long add spaces at the end to make it 60 chars long
             if len(title) < 60:
                 title = title + ' ' * (60 - len(title))
             print title[:60] + ' is on SIG: www.soitgo.es' + link_param
+            # Write the category, title, and link to a results.txt
             results_file.write(category + '\t\t' + title[:55] + '\t\twww.soitgo.es' + link_param + '\n')
             
+    # Inform the user if no results were found
     if result_found == False:
-        print "No Results Found."
+        no_link_text = page.find('h4').text
+        no_link_text = no_link_text[:no_link_text.index('Please try again')]
+        print no_link_text.encode('utf-8')
         results_file.write("\nNo Results Found.\n")
-    
+
+
+    while True:    
+        write_to_wanted = raw_input("\nWould you like to add this search to" + wanted_file_loc + " \"Yes\"/\"No\" (Filters are removed): ")
+        if write_to_wanted[:1].lower() == 'y':
+            if search_term.find('cat:') != -1:
+                search_term = search_term[:search_term.index('cat:')]
+            wanted_file = open(wanted_file_loc, 'a')
+            wanted_file.write('\n' + search_term)
+            wanted_file.close()
+            print "wanted.txt updated!"
+            break
+        elif write_to_wanted[:1].lower() == 'n':
+            break
+        else:
+            print "Invalid Input. Please enter \"Yes\" or \"No\""
+
+            
     results_file.close()
     print "\nDone Searching. Information stored in results.txt\n"
 

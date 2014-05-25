@@ -2,7 +2,7 @@ SIG-Scrape
 =========
 SIG-Scrape can:
 
-Scrape the homepage of SIG.  Send an email with the matching results as the body.
+Scrape the homepage of SIG.  Send an email (only with gmail account) with the matching results as the body.
 Search for a specific item.  Displays the results in the console and writes them to results.txt
 
 Must have wanted.txt in the same directory

@@ -1,24 +1,23 @@
 To Do:
 Make sure search results goes through all the pages of results
 
-Create a search method that does the following:
-    Searches SIG for search term. (Done)
-    If search result is empty: (Done)
-        Inform user that there were no results (Done)
-        Prompt user to add search to wanted.txt
-        If yes:
-            Append term to wanted.txt
-    If there are results: (Done)
-        Display all results to the user. (Done)
-        Prompt user to add serach to wanted.txt
-        If yes:
-            append term to wanted.txt
-
-
-
 Completed:
 Figure out how to make the subject line change
 Make login parameters be passed as arguments
 Make email and email password be passed as CLA
 Spawn off thread to speed up email and writing processes (Made it faster by only sending one email. Multithreading removed)
 Exit program once it has reached an item it's already seen
+
+This is fully complete
+    Create a search method that does the following:
+        Searches SIG for search term.
+        If search result is empty:
+            Inform user that there were no results
+            Prompt user to add search to wanted.txt
+            If yes:
+                Append term to wanted.txt
+        If there are results:
+            Display all results to the user. (Done)
+            Prompt user to add serach to wanted.txt
+            If yes:
+                append term to wanted.txt
