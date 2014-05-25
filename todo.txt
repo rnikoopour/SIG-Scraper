@@ -16,7 +16,7 @@ This is fully complete
             Prompt user to add search to wanted.txt
             If yes:
                 Append term to wanted.txt
-        If there are results:
+        If there are results:cd d
             Display all results to the user. (Done)
             Prompt user to add serach to wanted.txt
             If yes:

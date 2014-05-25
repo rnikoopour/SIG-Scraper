@@ -29,6 +29,9 @@ def login_to_sig(sig_un, sig_pass):
 def scrape(sig_un, sig_pass, email_un, email_pass):
     print "\nScraping!\n"
     
+    # Used to see if an email needs to be sent
+    send_email = False
+    
     # Variable to control writing to first found file
     first_title_saved = False
     
@@ -76,6 +79,7 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
                         i = i.strip()
                         # See if i is a substring in title
                         if re.search(i.lower(), title.lower()):
+                            send_email = True
                             # Add it to the body of the email.
                             body_text = body_text + '\n' + title + " is now on SIG: www.soitgo.es" + link_param + '\n'
                     
@@ -86,23 +90,24 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
                 break
     
     
-    # Create a new server connection for each thread
-    server = smtplib.SMTP('smtp.gmail.com:587')  
-    server.starttls()
-    server.login(email_un, email_pass)
+    if send_email == True:
+        # Create a new server connection for each thread
+        server = smtplib.SMTP('smtp.gmail.com:587')  
+        server.starttls()
+        server.login(email_un, email_pass)
     
-    # Set up the email   
-    msg = MIMEText(body_text.encode('utf-8'))
-    msg['Subject'] = "Matches found on SIG!"
-    msg['From'] = email_un
-    msg['To'] = email_un
+        # Set up the email   
+        msg = MIMEText(body_text.encode('utf-8'))
+        msg['Subject'] = "Matches found on SIG!"
+        msg['From'] = email_un
+        msg['To'] = email_un
 
 
-    # The actual mail send  
-    # Sent from email to email with msg as the headers and body
-    server.sendmail(email_un, email_un, msg.as_string()) 
-    # Close server connection
-    server.quit()
+        # The actual mail send  
+        # Sent from email to email with msg as the headers and body
+        server.sendmail(email_un, email_un, msg.as_string()) 
+        # Close server connection
+        server.quit()
     
     print "\nDone Scraping!\n"
     
