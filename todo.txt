@@ -1,5 +1,7 @@
 To Do:
 Make sure search results goes through all the pages of results
+sigsearch "one two" gives a bash error for too many args
+
 
 Completed:
 Figure out how to make the subject line change
