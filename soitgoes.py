@@ -3,8 +3,20 @@ import string, email
 import sys, thread, time
 from email.mime.text import MIMEText
 
-def main(argv):
-    print "RUNNING!"
+def login_to_sig(sig_un, sig_pass):
+    # Login URL and parameters for SIG
+    LOGIN_URL = 'https://soitgo.es/?i=redirect&r=YToxOntzOjE6ImkiO3M6NDoibWFpbiI7fQ=='
+    PARAMS = {'user':sig_un, 'pass':sig_pass}
+    
+    # Get homepage to get session cookie
+    home_req = requests.get('https://soitgo.es')
+    
+    # Log into the website
+    login_req = requests.post(LOGIN_URL, data=PARAMS, cookies=home_req.cookies)
+    return login_req
+    
+def scrape(sig_un, sig_pass, email_un, email_pass):
+    print "Scraping!"
     # Variable to control writing to first found file
     first_title_saved = False
     
@@ -15,19 +27,7 @@ def main(argv):
     last_read = [item for item in open('lastread.txt', 'r')]
     last_read_found = False
     
-    # Login URL and parameters for SIG
-    LOGIN_URL = 'https://soitgo.es/?i=redirect&r=YToxOntzOjE6ImkiO3M6NDoibWFpbiI7fQ=='
-    PARAMS = {'user':argv[0], 'pass':argv[1]}
-    
-    # set up the username and password for the email account
-    email_username = argv[2]
-    email_password = argv[3]
-    
-    # Get homepage to get session cookie
-    home_req = requests.get('https://soitgo.es')
-    
-    # Log into the website
-    login_req = requests.post(LOGIN_URL, data=PARAMS, cookies=home_req.cookies)
+    login_req = login_to_sig(sig_un, sig_pass)
 
     # Create a BeautifulSoup object using the HTML contents after logging in
     page = bs4.BeautifulSoup(login_req.content)
@@ -75,22 +75,26 @@ def main(argv):
     # Create a new server connection for each thread
     server = smtplib.SMTP('smtp.gmail.com:587')  
     server.starttls()
-    server.login(email_username, email_password)
+    server.login(email_un, email_pass)
     
     # Set up the email   
     msg = MIMEText(body_text.encode('utf-8'))
     msg['Subject'] = "Matches found on SIG!"
-    msg['From'] = email_username
-    msg['To'] = email_username
+    msg['From'] = email_un
+    msg['To'] = email_un
 
 
     # The actual mail send  
     # Sent from email to email with msg as the headers and body
-    server.sendmail(email_username, email_username, msg.as_string()) 
+    server.sendmail(email_un, email_un, msg.as_string()) 
     # Close server connection
     server.quit()
+    
+    print "Done Scraping!"
 
-
+def main(argv):
+    if argv[0] == "scrape":
+        scrape(argv[1], argv[2], argv[3], argv[4])
 
 if __name__ == '__main__':
     #Pass command line args to main
