@@ -1,0 +1,9 @@
+To Do:
+Have it check 10(?) rows at a time using multithreading.
+
+Completed:
+Figure out how to make the subject line change
+Make login parameters be passed as arguments
+Make email and email password be passed as CLA
+Spawn off thread to speed up email and writing processes
+Exit program once it has reached an item it's already seen
