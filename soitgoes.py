@@ -3,52 +3,13 @@ import string, email
 import sys, thread, time
 from email.mime.text import MIMEText
 
-# Number of threads currently executing
-num_threads = 0
-# If any thread has started
-thread_started = False
-# Lock for critical section
-lock = thread.allocate_lock()
-
-def send_email(email, title, link_param, server):
-    # Get access to global variables
-    global num_threads, thread_started
-
-    # Lock the memory to do nonatomic operations
-    lock.acquire()
-    num_threads += 1
-    thread_started = True
-    #print 'THREAD CREATED: ' + str(num_threads) + ' ' + title
-    # Release the lock so other threads can have access
-    lock.release()
-
-    # Set up the email   
-    body_text = title + " is now on SIG: www.soitgo.es" + link_param
-    msg = MIMEText(body_text.encode('utf-8'))
-    msg['Subject'] = title
-    msg['From'] = email
-    msg['To'] = email
-
-    # The actual mail send  
-    # Sent from email to email with msg as the headers and body
-    server.sendmail(email, email, msg.as_string()) 
-    # Close server connection
-    server.quit()
-    
-    # Acquire the lock for nonatomic operations
-    lock.acquire()
-    num_threads -= 1
-    #print 'Thread for ' + title + ' is over '
-    #release the lock so of threads can have access
-    lock.release()
-
 def main(argv):
     print "RUNNING!"
-    # Get access to global variables
-    global num_threads, thread_started
-    
     # Variable to control writing to first found file
     first_title_saved = False
+    
+    # Set up body_text for later use
+    body_text = ""
     
     # This is the title of the first item read during the last run
     last_read = [item for item in open('lastread.txt', 'r')]
@@ -101,35 +62,33 @@ def main(argv):
                         i = item[:-1]
                         # See if i is a substring in title
                         if re.search(i.lower(), title.lower()):
-                            # Create a new server connection for each thread
-                            server = smtplib.SMTP('smtp.gmail.com:587')  
-                            server.starttls()
-                            server.login(email_username, email_password)
-                            # Create a new thread that will send the email out
-                            thread.start_new_thread( send_email, (email_username, title, link_param, server,) )
-                            #print title
+                            # Add it to the body of the email.
+                            body_text = body_text + '\n' + title + " is now on SIG: www.soitgo.es" + link_param + '\n'
                     
             # If the currently title has already been read
             else:
                 # We found the first title read during the last run
                 #   so break from the loop
-                last_read_found = True
                 break
-            '''
-            # Prints out all the category, title, and info
-            row_text = ''
-            for child in row.contents[:3]:
-               row_text += child.text + ' '
+    
+    
+    # Create a new server connection for each thread
+    server = smtplib.SMTP('smtp.gmail.com:587')  
+    server.starttls()
+    server.login(email_username, email_password)
+    
+    # Set up the email   
+    msg = MIMEText(body_text.encode('utf-8'))
+    msg['Subject'] = "Matches found on SIG!"
+    msg['From'] = email_username
+    msg['To'] = email_username
 
-            print row_text.encode('utf-8')
-            '''
-    # Idle this thread to allow any spawned threads to properly increment num_threads
-    time.sleep(1)
-    # Loops if we've found the last_read_item or num_threads > 0
-    while ((not last_read_found) and thread_started == False) or (num_threads > 0):
-        print "HERE IT IS"
-        # print 'Waiting. Threads: ' + str(num_threads)
-        pass  
+
+    # The actual mail send  
+    # Sent from email to email with msg as the headers and body
+    server.sendmail(email_username, email_username, msg.as_string()) 
+    # Close server connection
+    server.quit()
 
 
 
