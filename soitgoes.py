@@ -79,6 +79,7 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
                         i = i.strip()
                         # See if i is a substring in title
                         if re.search(i.lower(), title.lower()):
+                            # Let us know that an email needs to be sent
                             send_email = True
                             # Add it to the body of the email.
                             body_text = body_text + '\n' + title + " is now on SIG: www.soitgo.es" + link_param + '\n'
@@ -90,6 +91,7 @@ def scrape(sig_un, sig_pass, email_un, email_pass):
                 break
     
     
+    # Only send email if we found a match
     if send_email == True:
         # Create a new server connection for each thread
         server = smtplib.SMTP('smtp.gmail.com:587')  
@@ -163,9 +165,13 @@ def search(sig_un, sig_pass, search_term):
         print no_link_text.encode('utf-8')
         results_file.write("\nNo Results Found.\n")
 
+    # Close result_file_loc
+    results_file.close()
 
+    # Prompt the user if they want to add their search into wanted_file_loc
     while True:    
         write_to_wanted = raw_input("\nWould you like to add this search to" + wanted_file_loc + " \"Yes\"/\"No\" (Filters are removed): ")
+        # If the user said yes strip and category prefs and store the plain term in wanted_file_loc
         if write_to_wanted[:1].lower() == 'y':
             if search_term.find('cat:') != -1:
                 search_term = search_term[:search_term.index('cat:')]
@@ -174,13 +180,13 @@ def search(sig_un, sig_pass, search_term):
             wanted_file.close()
             print "wanted.txt updated!"
             break
+        # If they say no break the loop
         elif write_to_wanted[:1].lower() == 'n':
             break
+        # Handles invalid input
         else:
             print "Invalid Input. Please enter \"Yes\" or \"No\""
 
-            
-    results_file.close()
     print "\nDone Searching. Information stored in results.txt\n"
 
 def main(argv):
