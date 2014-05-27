@@ -2,13 +2,13 @@ import bs4, requests, smtplib, re
 import string, email
 import sys, thread, time
 import string
+# file_loc is a file named file_loc.py with the file paths for
+#   wanted_file_loc, lastread_file_loc, search_results_file_loc
+from file_loc import wanted_file_loc, lastread_file_loc, search_results_file_loc
 from email.mime.text import MIMEText
 
 # This will hold our cookie gloablly
 sig_cookies = None
-wanted_file_loc = 'wanted.txt'
-lastread_file_loc = 'lastread.txt'
-search_results_file_loc = 'results.txt'
 
 def login_to_sig(sig_un, sig_pass):
     global sig_cookies
@@ -176,7 +176,7 @@ def search(sig_un, sig_pass, search_term):
 
     # Prompt the user if they want to add their search into wanted_file_loc
     while True:    
-        write_to_wanted = raw_input("\nWould you like to add this search to" + wanted_file_loc + " \"Yes\"/\"No\" (Filters are removed): ")
+        write_to_wanted = raw_input("\nWould you like to add this search to " + wanted_file_loc + " \"Yes\"/\"No\" (Filters are removed): ")
         # If the user said yes strip and category prefs and store the plain term in wanted_file_loc
         if write_to_wanted[:1].lower() == 'y':
             currently_wanted = [item for item in open(wanted_file_loc, 'r')]
@@ -187,19 +187,19 @@ def search(sig_un, sig_pass, search_term):
                 wanted_file = open(wanted_file_loc, 'a')
                 wanted_file.write('\n' + search)
                 wanted_file.close()
-                print "\nwanted.txt updated!"
+                print "\n" + wanted_file_loc + " updated!"
             else:
-                print "\nNo changes made to wanted.txt. " + search + " is already in " + wanted_file_loc
+                print "\nNo changes made to " + wanted_file_loc + "\n" + search + " is already in " + wanted_file_loc
             break
         # If they say no break the loop
         elif write_to_wanted[:1].lower() == 'n':
-            print "No changes made to wanted.txt"
+            print "No changes made to " + wanted_file_loc
             break
         # Handles invalid input
         else:
             print "Invalid Input. Please enter \"Yes\" or \"No\""
 
-    print "\nDone Searching. Information stored in results.txt\n"
+    print "\nDone Searching. Information stored in " + search_results_file_loc
 
 def main(argv):
     if argv[0] == "scrape":
