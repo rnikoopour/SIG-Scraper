@@ -18,9 +18,10 @@ This command searches SIG
 
 Results of pip freeze:
 =========
-beautifulsoup4==4.3.2-
-requests==2.3.0-
-wsgiref==0.1.2-
+    $ pip freeze
+    beautifulsoup4==4.3.2
+    requests==2.3.0
+    wsgiref==0.1.2
 
 Add this to your bash profile to make searching easier:
 =========
