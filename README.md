@@ -44,5 +44,5 @@ Add this to your bash profile to use search from command line using sigsearch "S
 Use of sigsearch:
 =========
     $ sigsearch "Search Term"
-or
+or:
     $ sigsearch "\"Search Term\""
