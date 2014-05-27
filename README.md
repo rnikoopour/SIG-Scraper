@@ -17,21 +17,21 @@ wsgiref==0.1.2
 
 Add this to your bash profile to make searching easier:
 =========
-sigsearch() { 
-    if [ "$1" == "-h" ]; then
-        echo "sigsearch \"Search Term\""
-        return
-    fi
+    sigsearch() { 
+        if [ "$1" == "-h" ]; then
+            echo "sigsearch \"Search Term\""
+            return
+        fi
     
-    if [ $# -eq 1 ]; then
-        source /Location/To/Virtual/Env
-        python /Path/To/soitgoes.py search SIG_UN SIG_PW "$@"
-        deactivate
-        return
-    else
-        echo "sigsearch \"Search Term\""
-    fi
-}
+        if [ $# -eq 1 ]; then
+            source /Location/To/Virtual/Env
+            python /Path/To/soitgoes.py search SIG_UN SIG_PW "$@"
+            deactivate
+            return
+        else
+            echo "sigsearch \"Search Term\""
+        fi
+    }
 
 Use:
 =========
