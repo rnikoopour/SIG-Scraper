@@ -36,11 +36,9 @@ sigsearch() {
 Use:
 =========
 This command scrapes the homepage
---
-python soitgoes.py scrape SIG-username SIG-password email-username email-pass
---
+    
+    python soitgoes.py scrape SIG-username SIG-password email-username email-pass
 
 This command searches SIG
---
-python soitgoes.py search SIG-username SIG-password "Search Term"
---
+
+    python soitgoes.py search SIG-username SIG-password "Search Term"
