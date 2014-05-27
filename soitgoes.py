@@ -1,6 +1,7 @@
 import bs4, requests, smtplib, re
 import string, email
 import sys, thread, time
+import string
 from email.mime.text import MIMEText
 
 # This will hold our cookie gloablly
@@ -119,6 +120,8 @@ def search(sig_un, sig_pass, search_term):
     # Get global reference so we can use the cookie provided to us
     global sig_cookies
     
+    search = ' '.join(search_term)
+    
     # Lets us know if we find results
     result_found = False
     
@@ -126,7 +129,7 @@ def search(sig_un, sig_pass, search_term):
     login_to_sig(sig_un, sig_pass)
 
     # Set up the search url 
-    search_url = 'https://soitgo.es/?i=' + search_term + '&do=search'
+    search_url = 'https://soitgo.es/?i=' + search + '&do=search'
     
     # Get search results page and turn it into Beautiful Soup
     search_results = requests.get(search_url, cookies=sig_cookies)
@@ -151,9 +154,12 @@ def search(sig_un, sig_pass, search_term):
             category = row.find(class_='category').text
             title = row.find(class_='title').text
             link_param = row.find_all('a')[1].get('href')
+
+            title = filter(lambda x: x in string.printable, title)
             # If the title is less than 60 chars long add spaces at the end to make it 60 chars long
             if len(title) < 60:
                 title = title + ' ' * (60 - len(title))
+                
             print title[:60] + ' is on SIG: www.soitgo.es' + link_param
             # Write the category, title, and link to a results.txt
             results_file.write(category + '\t\t' + title[:55] + '\t\twww.soitgo.es' + link_param + '\n')
@@ -173,15 +179,21 @@ def search(sig_un, sig_pass, search_term):
         write_to_wanted = raw_input("\nWould you like to add this search to" + wanted_file_loc + " \"Yes\"/\"No\" (Filters are removed): ")
         # If the user said yes strip and category prefs and store the plain term in wanted_file_loc
         if write_to_wanted[:1].lower() == 'y':
-            if search_term.find('cat:') != -1:
-                search_term = search_term[:search_term.index('cat:')]
-            wanted_file = open(wanted_file_loc, 'a')
-            wanted_file.write('\n' + search_term)
-            wanted_file.close()
-            print "wanted.txt updated!"
+            currently_wanted = [item for item in open(wanted_file_loc, 'r')]
+            if search.find('cat:') != -1:
+                search = search[:search.index('cat:')]
+            search = re.sub('\"', '', search.strip())
+            if not search in currently_wanted:
+                wanted_file = open(wanted_file_loc, 'a')
+                wanted_file.write('\n' + search)
+                wanted_file.close()
+                print "\nwanted.txt updated!"
+            else:
+                print "\nNo changes made to wanted.txt. " + search + " is already in " + wanted_file_loc
             break
         # If they say no break the loop
         elif write_to_wanted[:1].lower() == 'n':
+            print "No changes made to wanted.txt"
             break
         # Handles invalid input
         else:
@@ -193,7 +205,10 @@ def main(argv):
     if argv[0] == "scrape":
         scrape(argv[1], argv[2], argv[3], argv[4])
     elif argv[0] == "search":
-        search(argv[1], argv[2], argv[3])
+        if re.match(r'^\"*', ' '.join(argv[3:])):
+            search(argv[1], argv[2], argv[3:])
+        else:
+            print ""
 
 if __name__ == '__main__':
     #Pass command line args to main
