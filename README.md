@@ -7,11 +7,11 @@ Search for a specific item.  Displays the results in the console and writes them
 
 Use:
 =========
-This command scrapes the homepage
-    
+This command scrapes the homepage:
+
     python soitgoes.py scrape SIG-username SIG-password email-username email-pass
 
-This command searches SIG
+This command searches SIG:
 
     python soitgoes.py search SIG-username SIG-password "Search Term"
 
@@ -23,7 +23,7 @@ Results of pip freeze:
     requests==2.3.0
     wsgiref==0.1.2
 
-Add this to your bash profile to make searching easier:
+Add this to your bash profile to use search from command line using sigsearch "Search Term":
 =========
     sigsearch() { 
         if [ "$1" == "-h" ]; then
